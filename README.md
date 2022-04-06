@@ -32,7 +32,7 @@ feed-forward computing tasks.
 $git clone https://github.com/lzhangbv/dear_pytorch.git
 $cd dear_pytorch
 $pip install -r requirements.txt
-$HOROVOD_GPU_OPERATIONS=NCCL pip install horovod
+$HOROVOD_GPU_OPERATIONS=NCCL pip install horovod==0.21.3
 ```
 
 If pip installation failed, please try to upgrade pip via `pip install --upgrade pip`. If Horovod installation with NCCL failed, please check the installation [guide](https://horovod.readthedocs.io/en/stable/install_include.html). To run ByteScheduler, please check the installation [instruction](https://github.com/bytedance/byteps/tree/bytescheduler/bytescheduler) and it was found to be compatible with PyTorch 1.4. 
