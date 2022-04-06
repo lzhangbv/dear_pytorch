@@ -4,8 +4,7 @@
 # ngpu_per_node=4 node_count=2 rdma=1 script=$script params=$params bash launch_torch.sh
 
 # python env and script
-PY="/home/esetstore/pytorch1.8/bin/python"
-#PY=/home/esetstore/pytorch1.10/bin/python
+source ../configs/envs.conf
 directory=`pwd`
 script="${script:-}"
 params="${params:-}"
@@ -14,9 +13,9 @@ echo "launch dir: $directory"
 # network config
 rdma="${rdma:-1}"
 if [ "$rdma" = "0" ]; then
-    net_config="export NCCL_SOCKET_IFNAME=enp136s0f0,enp137s0f0; export NCCL_IB_DISABLE=1;"
+    net_config="export NCCL_SOCKET_IFNAME=$ETH_INTERFACE; export NCCL_IB_DISABLE=1;"
 else
-    net_config="export NCCL_SOCKET_IFNAME=ib0; export NCCL_IB_DISABLE=0;"
+    net_config="export NCCL_SOCKET_IFNAME=$IB_INTERFACE; export NCCL_IB_DISABLE=0;"
 fi
 net_config="export OMP_NUM_THREADS=1; $net_config"
 

@@ -103,8 +103,8 @@ void Communicator::barrier() {
 void Communicator::synchronize() {
     //CUDACHECK(cudaStreamSynchronize(m_stream));
     for (int i = 0; i < m_num_comms; i++) {
-        //CUDACHECK(cudaStreamSynchronize(m_streams[i]));
-        CUDACHECK(cudaStreamWaitEvent(m_streams[i], m_events[i], 0));
+        CUDACHECK(cudaStreamSynchronize(m_streams[i]));
+        //CUDACHECK(cudaStreamWaitEvent(m_streams[i], m_events[i], 0));
         m_sync_flags[i] = true;
     }
 }
@@ -130,7 +130,7 @@ int Communicator::getNumOfFreeStreams() {
 int Communicator::reduce(torch::Tensor tensor, int root) {
     int current_comm = m_current_comm;
     NCCLCHECK(ncclReduce(tensor.data_ptr<float>(), tensor.data_ptr<float>(), tensor.numel(), ncclFloat, ncclSum, root, m_nccl_comms[current_comm], m_streams[current_comm]));
-    CUDACHECK(cudaEventRecord(m_events[current_comm], m_streams[current_comm]));
+    //CUDACHECK(cudaEventRecord(m_events[current_comm], m_streams[current_comm]));
     m_current_comm++;
     m_current_comm %= m_num_comms;
     m_sync_flags[current_comm] = false;
@@ -147,7 +147,7 @@ int Communicator::bcast(torch::Tensor tensor, int root) {
         nccl_type = ncclInt64;
         NCCLCHECK(ncclBroadcast(tensor.data_ptr<long>(), tensor.data_ptr<long>(), tensor.numel(), nccl_type, root, m_nccl_comms[m_current_comm], m_streams[m_current_comm]));
     }
-    CUDACHECK(cudaEventRecord(m_events[m_current_comm], m_streams[m_current_comm]));
+    //CUDACHECK(cudaEventRecord(m_events[m_current_comm], m_streams[m_current_comm]));
     m_current_comm++;
     m_current_comm %= m_num_comms;
     m_sync_flags[current_comm] = false;
@@ -163,7 +163,7 @@ void Communicator::reduceScatter(torch::Tensor send_tensor, torch::Tensor recv_t
         nccl_type = ncclInt64;
         NCCLCHECK(ncclReduceScatter(send_tensor.data_ptr<long>(), recv_tensor.data_ptr<long>(), recv_tensor.numel(), ncclInt64, ncclSum, m_nccl_comms[m_current_comm], m_streams[m_current_comm]));
     }
-    CUDACHECK(cudaEventRecord(m_events[m_current_comm], m_streams[m_current_comm]));
+    //CUDACHECK(cudaEventRecord(m_events[m_current_comm], m_streams[m_current_comm]));
     m_current_comm++;
     m_current_comm %= m_num_comms;
 }
@@ -177,7 +177,7 @@ void Communicator::allGather(torch::Tensor send_tensor, torch::Tensor recv_tenso
         nccl_type = ncclInt64;
         NCCLCHECK(ncclAllGather(send_tensor.data_ptr<long>(), recv_tensor.data_ptr<long>(), send_tensor.numel(), ncclInt64, m_nccl_comms[m_current_comm], m_streams[m_current_comm]));
     }
-    CUDACHECK(cudaEventRecord(m_events[m_current_comm], m_streams[m_current_comm]));
+    //CUDACHECK(cudaEventRecord(m_events[m_current_comm], m_streams[m_current_comm]));
     m_current_comm++;
     m_current_comm %= m_num_comms;
 }
@@ -189,7 +189,7 @@ void Communicator::allReduceRB(torch::Tensor tensor) {
     NCCLCHECK(ncclReduce(tensor.data_ptr<float>(), tensor.data_ptr<float>(), tensor.numel(), ncclFloat, ncclSum, root, m_nccl_comms[current_comm], m_streams[current_comm]));
     NCCLCHECK(ncclBroadcast(tensor.data_ptr<float>(), tensor.data_ptr<float>(), tensor.numel(), nccl_type, root, m_nccl_comms[current_comm], m_streams[current_comm]));
 
-    CUDACHECK(cudaEventRecord(m_events[current_comm], m_streams[current_comm]));
+    //CUDACHECK(cudaEventRecord(m_events[current_comm], m_streams[current_comm]));
     m_current_comm++;
     m_current_comm %= m_num_comms;
     m_sync_flags[current_comm] = false;
@@ -229,14 +229,14 @@ void Communicator::allReduceRSAG(torch::Tensor tensor) {
         }
     }
 
-    CUDACHECK(cudaEventRecord(m_events[m_current_comm], m_streams[m_current_comm]));
+    //CUDACHECK(cudaEventRecord(m_events[m_current_comm], m_streams[m_current_comm]));
     m_current_comm++;
     m_current_comm %= m_num_comms;
 }
 
 void Communicator::allReduce(torch::Tensor tensor) {
     NCCLCHECK(ncclAllReduce(tensor.data_ptr<float>(), tensor.data_ptr<float>(), tensor.numel(), ncclFloat, ncclSum, m_nccl_comms[m_current_comm], m_streams[m_current_comm]));
-    CUDACHECK(cudaEventRecord(m_events[m_current_comm], m_streams[m_current_comm]));
+    //CUDACHECK(cudaEventRecord(m_events[m_current_comm], m_streams[m_current_comm]));
     m_current_comm++;
     m_current_comm %= m_num_comms;
 }
@@ -277,7 +277,7 @@ void Communicator::multiBcast(vector<torch::Tensor> &tensor_list, vector<torch::
         assigned_rank = tensor_ranks[i];
         if (m_size > 1 and assigned_rank >= 0) {
             NCCLCHECK(ncclBroadcast(output.data_ptr<float>(), output.data_ptr<float>(), output.numel(), ncclFloat, assigned_rank, m_nccl_comms[m_current_comm], m_streams[m_current_comm])); 
-            CUDACHECK(cudaEventRecord(m_events[m_current_comm], m_streams[m_current_comm]));
+            //CUDACHECK(cudaEventRecord(m_events[m_current_comm], m_streams[m_current_comm]));
             m_current_comm++;
             m_current_comm %= m_num_comms;
         }
@@ -297,9 +297,8 @@ void Communicator::sendrecv(torch::Tensor send_tensor, torch::Tensor recv_tensor
         NCCLCHECK(ncclRecv(recv_tensor.data_ptr<long>(), recv_tensor.numel(), nccl_type, peer, m_nccl_comms[m_current_comm], m_streams[m_current_comm]));
     }
     NCCLCHECK(ncclGroupEnd());
-    CUDACHECK(cudaEventRecord(m_events[m_current_comm], m_streams[m_current_comm]));
+    //CUDACHECK(cudaEventRecord(m_events[m_current_comm], m_streams[m_current_comm]));
 
     m_current_comm++;
     m_current_comm %= m_num_comms;
 }
-

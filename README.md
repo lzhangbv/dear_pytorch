@@ -32,7 +32,10 @@ feed-forward computing tasks.
 $git clone https://github.com/lzhangbv/dear_pytorch.git
 $cd dear_pytorch
 $pip install -r requirements.txt
+$HOROVOD_GPU_OPERATIONS=NCCL pip install horovod
 ```
+
+If pip installation failed, please try to upgrade pip via `pip install --upgrade pip`. If Horovod installation with NCCL failed, please check the installation [guide](https://horovod.readthedocs.io/en/stable/install_include.html). To run ByteScheduler, please check the installation [instruction](https://github.com/bytedance/byteps/tree/bytescheduler/bytescheduler) and it was found to be compatible with PyTorch 1.4. 
 
 ### Configure the cluster settings
 Before running the scripts, please carefully configure the configuration files in the directory of `configs`.
@@ -41,12 +44,13 @@ Before running the scripts, please carefully configure the configuration files i
 
 Compile the communication package:
 ```
-$ bash common/comm_core/compile.sh
+$ cd common/comm_core
+$ bash compile.sh
 ```
 
-Create a log folder, e.g., 
+Create a log folder in the dear_pytorch dir, e.g., 
 ```
-$mkdir -p logs/sc22tf
+$mkdir -p logs/sc22-tf
 ```
 
 ### Run benchmarks
