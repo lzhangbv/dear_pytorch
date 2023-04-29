@@ -94,13 +94,13 @@ Example script for training on MNIST was provided.
 $ bash mnist.sh
 ```
 
-<!-- ## Paper
+## Paper
 If you are using this repository for your paper, please cite our work
 ```
-@article{shi2020ddlsurvey,
-    author = {Shi, Shaohuai and Tang, Zhenheng and Chu, Xiaowen and Liu, Chengjian and Wang, Wei and Li, Bo},
-    title = {Communication-Efficient Distributed Deep Learning: Survey, Evaluation, and Challenges},
-    journal = {arXiv},
-    year = {2020}
+@article{zhang2023decoupling,
+  title={Decoupling the All-Reduce Primitive for Accelerating Distributed Deep Learning},
+  author={Zhang, Lin and Shi, Shaohuai and Chu, Xiaowen and Wang, Wei and Li, Bo and Liu, Chengjian},
+  journal={arXiv preprint arXiv:2302.12445},
+  year={2023}
 }
-``` -->
+```
