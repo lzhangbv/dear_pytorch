@@ -37,6 +37,8 @@ $HOROVOD_GPU_OPERATIONS=NCCL pip install horovod==0.21.3
 
 If pip installation failed, please try to upgrade pip via `pip install --upgrade pip`. If Horovod installation with NCCL failed, please check the installation [guide](https://horovod.readthedocs.io/en/stable/install_include.html). To run ByteScheduler, please check the installation [instruction](https://github.com/bytedance/byteps/tree/bytescheduler/bytescheduler) and it was found to be compatible with PyTorch 1.4. 
 
+If you have encountered other errors during installation, please check the [install document](https://github.com/lzhangbv/dear_pytorch/blob/master/install.md) (contributed by Haoxuan Yu), and we recommend using the same software versions according to our [paper](https://arxiv.org/pdf/2302.12445.pdf) (section VI.A). 
+
 ### Configure the cluster settings
 Before running the scripts, please carefully configure the configuration files in the directory of `configs`.
 - configs/cluster\*: configure the host files for MPI
